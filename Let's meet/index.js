@@ -19,12 +19,15 @@ const bot = new BootBot({
 
 bot.setGreetingText('Hey there! Welcome to BootBot!');
 bot.setGetStartedButton((payload, chat) => {
-    chat.say('Welcome to BootBot. What are you looking for?');
+    chat.say('Welcome to BootBot. What are you looking for? Say Get started');
 });
 
 bot.hear(['Get Started'], (payload, chat) => {
-    chat.say('Hi there! I am your helping bot to help you and your' +
-        'friends meet effortlessly',{typing:true}).then(()=>{
+    chat.say('Hi there! I am your helping bot to help you and your ' +
+        'friends meet effortlessly. If you want to host a room press ' +
+        'Create Session or if you want to join a room created by your ' +
+        'friend then click Join Session. ' +
+        'If you want to exit anytime type "end"',{typing:true}).then(()=>{
         chat.conversation((convo) =>{
             convo.sendTypingIndicator(1000).then(() => askType(convo));
         });
@@ -43,9 +46,11 @@ const askType = (convo) => {
         if(text.toLowerCase() === 'create session' ){
             convo.set('state', 'host');
             createKey(convo);
-        } else if(text.toLowerCase() === 'male'){
+        } else if(text.toLowerCase() === 'join session'){
             convo.set('state', 'joint');
             askKey(convo);
+        }else if(text.toLowerCase() === 'end'){
+            convo.end();
         } else{
             convo.say('We couldn\'t catch what you just said').then(()=> askType(convo) );
         }
@@ -76,49 +81,41 @@ const createKey = (convo) =>{
         convo.set('name',name);
         convo.set('key',key);
         convo.set('id',user.id);
-        askLocation(convo);
-        /*const query = {
-            text: 'INSERT INTO users(user_id,user_name,key,state) VALUES($1,$2,$3,$4)',
-            values: [user.id,name,key,'host']
-        };
-        pool.query(query).then((res)=>{
-            askLocation(convo);
-        }).catch((error)=>{
-            console.log(error.message);
-        })*/
+        sendGIF(convo);
     });
 }
 
-bot.on('postback:CREATE_SESSIONe', (payload, chat) => {
-    var key = makeid(10);
-    chat.say(`Your session key is ${key} , share this to your friend`);
-    chat.getUserProfile().then((user) =>{
-        const name = user.first_name+' '+user.last_name;
-        const query = {
-            text: 'INSERT INTO users(user_id,user_name,key,state) VALUES($1,$2,$3,$4)',
-            values: [user.id,name,key,'host']
-        };
-        pool.query(query).then((res)=>{
-            chat.conversation((convo) => {
-                askLocation(convo,'host');
-            });
-        }).catch((error)=>{
-            console.log(error.message);
-        })
+
+const sendGIF = (convo) =>{
+    convo.say({
+        attachment: 'image',
+        url: 'https://raw.githubusercontent.com/TamimEhsan/TamimEhsan/master/Assets/7f7f2882899755a705a2953b6fcfc263.gif'
+    }).then(()=>{
+        askLocation(convo);
     });
-});
-
-
+}
 
 const askLocation = (convo) =>{
     convo.ask('Whats your location', (payload, convo) => {
-        console.log(payload.message)
+        console.log(payload.message.text);
+        if( payload.message.text === "end" ){
+            convo.end();
+        } else{
+            convo.say('Please send the location pin as the gif states').then(()=>{
+                askLocation(convo);
+            });
+        }
+
     }, [
         {
             event: 'attachment',
             callback: (payload, convo) => {
                 const text = payload.message.attachments[0].payload["coordinates"];
-                console.log(text);
+                if( text === undefined ){
+                    convo.say('Please send the location pin as the gif states').then(()=>{
+                        askLocation(convo);
+                    });
+                }
                 console.log("Lat: "+text.lat);
                 console.log("Long: "+text.long);
 
@@ -139,7 +136,7 @@ const askLocation = (convo) =>{
                         });
                         convo.end();
                     } else{
-                        convo.say('Your key is'+convo.get('key')).then(()=>{
+                        convo.say('Your key is '+convo.get('key')).then(()=>{
                             waitToEnd(convo);
                         });
 
@@ -182,6 +179,12 @@ const calculatePoint = (convo) =>{
     console.log("debug");
     const query = {
         text: `SELECT * FROM users WHERE key = '${convo.get('key')}'`
+	/*text: `SELECT AVG(lat) AS lat, AVG(long) AS long
+		FROM users
+		WHERE key = '${convo.get('key')}'
+	UNION	SELECT id,user_id,
+		FROM users
+		WHERE key = '${convo.get('key')}'`*/
     }
     pool.query(query).then((res)=>{
         var lat = 0.0,long = 0.0;
@@ -192,9 +195,10 @@ const calculatePoint = (convo) =>{
         lat = lat/res.rows.length;
         long = long/res.rows.length;
         console.log('here I am'+lat+" "+long);
-        /*for(var i=0;i<res.rows.length;i++){
+       /* for(var i=0;i<res.rows.length;i++){
             bot.sendTextMessage(res.rows[i].user_id,`Your destination is Lat: ${lat} and Long: ${long}`);
         }*/
+	//console.log(res);
         sendLocation(lat,long,res.rows);
         convo.end();
     }).then(()=>{
@@ -207,17 +211,30 @@ const calculatePoint = (convo) =>{
 
 
 const askKey = (convo) =>{
-    convo.ask('Enter the session key',(payload,convo)=>{
+    convo.ask('Enter the session key provided by your friend' +
+        ' . If you do not have one then ask your friend for one or ' +
+        'create your own session',(payload,convo)=>{
         const key = payload.message.text;
+        if( key === "end" ){
+            convo.end();
+            return ;
+        }
         console.log(key);
         convo.set('key',key);
         const query = {
             text: `SELECT * FROM users WHERE key = '${key}' AND state = 'host'`
         };
         pool.query(query).then((result)=>{
-           convo.say('You are joining the session of '+result.rows[0].user_name).then(()=>{
-               saveData(convo);
-           });
+            if( result.rows.length === 0 ){
+                convo.say('There are no room for this particular key').then(()=>{
+                    askKey(convo);
+                });
+            }else{
+                convo.say('You are joining the session of '+result.rows[0].user_name).then(()=>{
+                    saveData(convo);
+                });
+            }
+
         }).catch((error)=>{
             console.log(error.message);
         })
@@ -229,7 +246,7 @@ const saveData = (convo) =>{
         const name = user.first_name+' '+user.last_name;
         convo.set('name',name);
         convo.set('id',user.id);
-        askLocation(convo);
+        sendGIF(convo);
     });
 };
 
@@ -254,7 +271,7 @@ async function sendLocation(lat,long,dataRows){
                 lon: long
             }
         });
-        console.log(response.data);
+       // console.log(response.data);
         const location = response.data.display_name;
         for(var i=0;i<dataRows.length;i++){
             bot.sendTextMessage(dataRows[i].user_id,"Meet at "+location);
