@@ -175,6 +175,19 @@ const waitToEnd = (convo) => {
     ]);
 };
 
+function getMedian(arr) {
+    arr.sort();
+    var n = arr.length;
+    if (n%2 == 0) {
+        var i = Math.floor(n/2);
+        return (arr[i] + arr[i-1])/2;
+    }
+    else {
+        var i = Math.floor(n/2);
+        return arr[i];
+    }
+}
+
 const calculatePoint = (convo) =>{
     console.log("debug");
     const query = {
@@ -188,12 +201,16 @@ const calculatePoint = (convo) =>{
     }
     pool.query(query).then((res)=>{
         var lat = 0.0,long = 0.0;
+        var lat_list = [];
+        var long_list = [];
         for(var i=0;i<res.rows.length;i++){
-            lat+=res.rows[i].lat*1.0;
-            long+=res.rows[i].long*1.0;
+            lat_list.push(res.rows[i].lat*1.0);
+            long_list.push(res.rows[i].long*1.0);
+            //lat+=res.rows[i].lat*1.0;
+            //long+=res.rows[i].long*1.0;
         }
-        lat = lat/res.rows.length;
-        long = long/res.rows.length;
+        lat = getMedian(lat_list);
+        long = getMedian(long_list);
         console.log('here I am'+lat+" "+long);
        /* for(var i=0;i<res.rows.length;i++){
             bot.sendTextMessage(res.rows[i].user_id,`Your destination is Lat: ${lat} and Long: ${long}`);
