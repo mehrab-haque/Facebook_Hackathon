@@ -4,18 +4,20 @@ const Pool = require('pg').Pool;
 const axios = require('axios');
 
 const pool = new Pool({
-    user: 'Tamim',
-    host: 'localhost',
-    database: 'Meet',
-    password: '12345',
-    port: 5432
-});
+    user: process.env.db_user,
+    host: process.env.db_host,
+    database: process.env.db_db,
+    password: process.env.db_pass,
+    port: process.env.db_port
+})
 
 const bot = new BootBot({
-    accessToken: "EAAFKZABh8UxIBABML93tQT0dlnPUpeoP7l0RZAumsD8JrACBJUlnlBRKXZAQPe4ZAWYOFzZBrzR4AFnDO6HNdqZBzV8V3mFbaeVZBZCPr5hQciKhXHC0IHgXtclJaBnQfIEOfGRjoXZB2KQYm0rbER8RsbtBbUwmGNgbh6jEMpsqe11VN1cCOKr7THtiIiQdUtZBMZD",
-    verifyToken: 'sokina',
-    appSecret: "905d5db00438684f6b3856517220f9ad"
+    accessToken: process.env.access_token,
+    verifyToken: process.env.verify_token,
+    appSecret: process.env.app_secret
 });
+
+
 
 bot.setGreetingText('Hey there! Welcome to BootBot!');
 bot.setGetStartedButton((payload, chat) => {
@@ -121,13 +123,13 @@ const askLocation = (convo) =>{
 
 
                 const query = {
-                    text: 'INSERT INTO users(user_id,user_name,key,state,lat,long) VALUES($1,$2,$3,$4,$5,$6)',
+                    text: 'INSERT INTO meet(user_id,user_name,key,state,lat,long) VALUES($1,$2,$3,$4,$5,$6)',
                     values: [convo.get('id'),convo.get('name'),convo.get('key'),convo.get('state'),text.lat,text.long]
                 };
                 pool.query(query).then((res)=>{
                     if( convo.get('state') != 'host' ){
                         const query2 = {
-                            text: `SELECT * FROM users WHERE key = '${convo.get('key')}' AND state = 'host'`
+                            text: `SELECT * FROM meet WHERE key = '${convo.get('key')}' AND state = 'host'`
                         };
                         pool.query(query2).then((res2)=>{
                             bot.sendTextMessage(res2.rows[0].user_id, convo.get('name')+' has entered your session');
@@ -193,7 +195,7 @@ function getMedian(arr) {
 const calculatePoint = (convo) =>{
     console.log("debug");
     const query = {
-        text: `SELECT * FROM users WHERE key = '${convo.get('key')}'`
+        text: `SELECT * FROM meet WHERE key = '${convo.get('key')}'`
 	/*text: `SELECT AVG(lat) AS lat, AVG(long) AS long
 		FROM users
 		WHERE key = '${convo.get('key')}'
@@ -223,7 +225,7 @@ const calculatePoint = (convo) =>{
         convo.end();
     }).then(()=>{
         pool.query(`DELETE
-                    FROM users
+                    FROM meet
                     WHERE key = '${key}'
         `).then((result)=>{
 
@@ -245,7 +247,7 @@ const askKey = (convo) =>{
         console.log(key);
         convo.set('key',key);
         const query = {
-            text: `SELECT * FROM users WHERE key = '${key}' AND state = 'host'`
+            text: `SELECT * FROM meet WHERE key = '${key}' AND state = 'host'`
         };
         pool.query(query).then((result)=>{
             if( result.rows.length === 0 ){
@@ -296,8 +298,19 @@ async function sendLocation(lat,long,dataRows){
         });
        // console.log(response.data);
         const location = response.data.display_name;
+        console.log(lat+" "+long);
+        var lat7 = lat.toFixed(7);
+        var long7 = long.toFixed(7);
+        console.log(lat7+" "+long7);
         for(var i=0;i<dataRows.length;i++){
-            bot.sendTextMessage(dataRows[i].user_id,"Meet at "+location);
+            await bot.sendTextMessage(dataRows[i].user_id,"Meet at "+location);
+            var latt = dataRows[i].lat.toFixed(7);
+            var longt = dataRows[i].long.toFixed(7);
+            await bot.sendTextMessage(dataRows[i].user_id,`Location: https://www.google.com/maps/search/?api=1&query=${lat7},${long7}`);
+          //  await bot.sendAttachment(dataRows[i].user_id,"file", `https://www.google.com/maps/search/?api=1&query=${lat7},${long7}`);
+          //  await bot.sendAttachment(dataRows[i].user_id,"image", `https://www.google.com/maps/search/?api=1&query=${lat7},${long7}`);
+            await bot.sendTextMessage(dataRows[i].user_id,`Route: https://www.google.com/maps/dir/?api=1&origin=${latt},${longt}&destination=${lat7},${long7}`);
+
         }
     } catch (error){
         console.log(error.message);
@@ -306,4 +319,5 @@ async function sendLocation(lat,long,dataRows){
 }
 
 
-bot.start(3000);
+const port=process.env.port||3000
+bot.start(port);
