@@ -19,7 +19,10 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a489d094-7726-43a7-8687-c609366fd183" name="Default Changelist" comment="" />
+    <list default="true" id="a489d094-7726-43a7-8687-c609366fd183" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/index.js" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -37,7 +40,7 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../buet_edu_1_backend" />
     <property name="nodejs_package_manager_path" value="npm" />
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -57,6 +60,8 @@
       <workItem from="1598104367552" duration="598000" />
       <workItem from="1598556732939" duration="182000" />
       <workItem from="1598556941787" duration="2699000" />
+      <workItem from="1598719489040" duration="2155000" />
+      <workItem from="1598803680753" duration="384000" />
     </task>
     <servers />
   </component>
@@ -76,9 +81,9 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="797" y="103" key="FileChooserDialogImpl" timestamp="1597953351182">
+    <state x="797" y="103" key="FileChooserDialogImpl" timestamp="1598804078904">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state x="797" y="103" key="FileChooserDialogImpl/0.0.1366.728@0.0.1366.728" timestamp="1597953351182" />
+    <state x="797" y="103" key="FileChooserDialogImpl/0.0.1366.728@0.0.1366.728" timestamp="1598804078904" />
   </component>
 </project>

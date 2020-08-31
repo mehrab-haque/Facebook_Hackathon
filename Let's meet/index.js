@@ -89,7 +89,7 @@ const createKey = (convo) =>{
 const sendGIF = (convo) =>{
     convo.say({
         attachment: 'image',
-        url: 'https://raw.githubusercontent.com/TamimEhsan/TamimEhsan/master/Assets/7f7f2882899755a705a2953b6fcfc263.gif'
+        url: 'https://raw.githubusercontent.com/TamimEhsan/TamimEhsan/master/Assets/SendLocation.gif'
     }).then(()=>{
         askLocation(convo);
     });
@@ -134,6 +134,8 @@ const askLocation = (convo) =>{
                         }).catch((error)=>{
                             console.log(error.message);
                         });
+                        convo.say('Your information have been added to the room. Please wait till the owner ends the session. ' +
+                            'Thank you for staying with us.')
                         convo.end();
                     } else{
                         convo.say('Your key is '+convo.get('key')).then(()=>{
@@ -199,6 +201,7 @@ const calculatePoint = (convo) =>{
 		FROM users
 		WHERE key = '${convo.get('key')}'`*/
     }
+    const key = convo.get('key');
     pool.query(query).then((res)=>{
         var lat = 0.0,long = 0.0;
         var lat_list = [];
@@ -219,9 +222,12 @@ const calculatePoint = (convo) =>{
         sendLocation(lat,long,res.rows);
         convo.end();
     }).then(()=>{
-        const query = {
-          //delete all rows with key = key
-        };
+        pool.query(`DELETE
+                    FROM users
+                    WHERE key = '${key}'
+        `).then((result)=>{
+
+        });
     });
 
 }
