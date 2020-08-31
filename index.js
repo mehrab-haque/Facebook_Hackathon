@@ -25,7 +25,7 @@ bot.setGetStartedButton((payload, chat) => {
 });
 
 bot.hear(['Get Started'], (payload, chat) => {
-    chat.say('Hi there! I am your helping bot to help you and your ' +
+    chat.say('Hi there! I am your helping bot MeetnGreet to help you and your ' +
         'friends meet effortlessly. If you want to host a room press ' +
         'Create Session or if you want to join a room created by your ' +
         'friend then click Join Session. ' +
