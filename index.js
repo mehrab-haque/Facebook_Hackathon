@@ -19,12 +19,12 @@ const bot = new BootBot({
 
 
 
-bot.setGreetingText('Hey there! Welcome to BootBot!');
-bot.setGetStartedButton((payload, chat) => {
-    chat.say('Welcome to BootBot. What are you looking for? Say Get started');
-});
+bot.setGreetingText('Welcome to BootBot. What are you looking for? Say Get started or hi');
+/*bot.setGetStartedButton((payload, chat) => {
+    chat.say('Welcome to BootBot. What are you looking for? Say Get started or hi');
+});*/
 
-bot.hear(['Get Started'], (payload, chat) => {
+bot.hear(['Get Started','hello', 'hi', /hey( there)?/i], (payload, chat) => {
     chat.say('Hi there! I am your helping bot MeetnGreet to help you and your ' +
         'friends meet effortlessly. If you want to host a room press ' +
         'Create Session or if you want to join a room created by your ' +
@@ -54,7 +54,7 @@ const askType = (convo) => {
         }else if(text.toLowerCase() === 'end'){
             convo.end();
         } else{
-            convo.say('We couldn\'t catch what you just said').then(()=> askType(convo) );
+            convo.say('We couldn\'t catch what you just said. If you want to end the conversation type end').then(()=> askType(convo) );
         }
 
     },[
@@ -103,7 +103,7 @@ const askLocation = (convo) =>{
         if( payload.message.text === "end" ){
             convo.end();
         } else{
-            convo.say('Please send the location pin as the gif states').then(()=>{
+            convo.say('Please send the location pin as the gif states. If you want to end the conversation type end').then(()=>{
                 askLocation(convo);
             });
         }
@@ -114,7 +114,7 @@ const askLocation = (convo) =>{
             callback: (payload, convo) => {
                 const text = payload.message.attachments[0].payload["coordinates"];
                 if( text === undefined ){
-                    convo.say('Please send the location pin as the gif states').then(()=>{
+                    convo.say('Please send the location pin as the gif states. If you want to end the conversation type end').then(()=>{
                         askLocation(convo);
                     });
                 }
@@ -166,7 +166,7 @@ const waitToEnd = (convo) => {
         if(text.toLowerCase() === 'end session' ){
             calculatePoint(convo);
         }else{
-            convo.say('We couldn\'t catch what you just said').then(()=> waitToEnd(convo) );
+            convo.say('We couldn\'t catch what you just said.').then(()=> waitToEnd(convo) );
         }
 
     },[
@@ -310,7 +310,7 @@ async function sendLocation(lat,long,dataRows){
           //  await bot.sendAttachment(dataRows[i].user_id,"file", `https://www.google.com/maps/search/?api=1&query=${lat7},${long7}`);
           //  await bot.sendAttachment(dataRows[i].user_id,"image", `https://www.google.com/maps/search/?api=1&query=${lat7},${long7}`);
             await bot.sendTextMessage(dataRows[i].user_id,`Route: https://www.google.com/maps/dir/?api=1&origin=${latt},${longt}&destination=${lat7},${long7}`);
-
+			await bot.sendTextMessage(dataRows[i].user_id,'Thank you for using meet and greet! We hope you have a great time together! If you wish to meet again you know what to do! Just say Hi!');
         }
     } catch (error){
         console.log(error.message);
