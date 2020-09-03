@@ -290,21 +290,17 @@ async function sendLocation(lat,long,dataRows){
 	 var lat7 = lat.toFixed(7);
     var long7 = long.toFixed(7);
     try{
-        var location;
-		try{
-			const response = await axios.get('https://us1.locationiq.com/v1/reverse.php', {
-				params: {
-					key: '5e137deebf37dc',
-					format: 'json',
-					lat: lat7,
-					lon: long7
-				}
-			});
-			location = response.data.display_name;
-		} catch (error) {
-			location = "Location error!";
-		}
+        var response;
+		response = await axios.get('https://us1.locationiq.com/v1/reverse.php', {
+            params: {
+                key: '5e137deebf37dc',
+                format: 'json',
+                lat: lat7,
+                lon: long7
+            }
+        });
        // console.log(response.data);
+        const location = response.data.display_name;
         console.log(lat+" "+long);
         var lat7 = lat.toFixed(7);
         var long7 = long.toFixed(7);
