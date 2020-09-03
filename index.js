@@ -290,8 +290,7 @@ async function sendLocation(lat,long,dataRows){
 	 var lat7 = lat.toFixed(7);
     var long7 = long.toFixed(7);
     try{
-        var response;
-		response = await axios.get('https://us1.locationiq.com/v1/reverse.php', {
+        const response = await axios.get('https://us1.locationiq.com/v1/reverse.php', {
             params: {
                 key: '5e137deebf37dc',
                 format: 'json',
@@ -302,7 +301,8 @@ async function sendLocation(lat,long,dataRows){
        // console.log(response.data);
         const location = response.data.display_name;
         console.log(lat+" "+long);
-        
+        var lat7 = lat.toFixed(7);
+        var long7 = long.toFixed(7);
         console.log(lat7+" "+long7);
         for(var i=0;i<dataRows.length;i++){
             await bot.sendTextMessage(dataRows[i].user_id,"Meet at "+location);
@@ -318,16 +318,6 @@ async function sendLocation(lat,long,dataRows){
     } catch (error){
         console.log(error.message);
         const location = "Sorry, We couldn't find it";
-		for(var i=0;i<dataRows.length;i++){
-            await bot.sendTextMessage(dataRows[i].user_id,"Meet at "+location);
-            var latt = dataRows[i].lat.toFixed(7);
-            var longt = dataRows[i].long.toFixed(7);
-            await bot.sendTextMessage(dataRows[i].user_id,`Location: https://www.google.com/maps/search/?api=1&query=${lat7},${long7}`);
-          //  await bot.sendAttachment(dataRows[i].user_id,"file", `https://www.google.com/maps/search/?api=1&query=${lat7},${long7}`);
-          //  await bot.sendAttachment(dataRows[i].user_id,"image", `https://www.google.com/maps/search/?api=1&query=${lat7},${long7}`);
-            await bot.sendTextMessage(dataRows[i].user_id,`Route: https://www.google.com/maps/dir/?api=1&origin=${latt},${longt}&destination=${lat7},${long7}`);
-			await bot.sendTextMessage(dataRows[i].user_id,'Thank you for using meet and greet! We hope you have a great time together! If you wish to meet again you know what to do! Just say Hi!');
-        }
     }
 }
 
