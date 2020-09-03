@@ -4,17 +4,17 @@ const Pool = require('pg').Pool;
 const axios = require('axios');
 
 const pool = new Pool({
-    user: "root",
-    host: "bueteduproject1.cvt7xn6497l2.ap-south-1.rds.amazonaws.com",
-    database: "postgres",
-    password: "bueteduproject1",
-    port: "5432"
+    user: process.env.db_user,
+    host: process.env.db_host,
+    database: process.env.db_db,
+    password: process.env.db_pass,
+    port: process.env.db_port
 })
 
 const bot = new BootBot({
-    accessToken: "EAAFKZABh8UxIBABML93tQT0dlnPUpeoP7l0RZAumsD8JrACBJUlnlBRKXZAQPe4ZAWYOFzZBrzR4AFnDO6HNdqZBzV8V3mFbaeVZBZCPr5hQciKhXHC0IHgXtclJaBnQfIEOfGRjoXZB2KQYm0rbER8RsbtBbUwmGNgbh6jEMpsqe11VN1cCOKr7THtiIiQdUtZBMZD",
-    verifyToken: "meetandgreet",
-    appSecret: "905d5db00438684f6b3856517220f9ad"
+    accessToken: process.env.access_token,
+    verifyToken: process.env.verify_token,
+    appSecret: process.env.app_secret
 });
 
 
@@ -290,16 +290,21 @@ async function sendLocation(lat,long,dataRows){
 	 var lat7 = lat.toFixed(7);
     var long7 = long.toFixed(7);
     try{
-        const response = await axios.get('https://us1.locationiq.com/v1/reverse.php', {
-            params: {
-                key: '5e137deebf37dc',
-                format: 'json',
-                lat: lat7,
-                lon: long7
-            }
-        });
+        var location;
+		try{
+			const response = await axios.get('https://us1.locationiq.com/v1/reverse.php', {
+				params: {
+					key: '5e137deebf37dc',
+					format: 'json',
+					lat: lat7,
+					lon: long7
+				}
+			});
+			location = response.data.display_name;
+		} catch (error) {
+			location = "Location error!";
+		}
        // console.log(response.data);
-        const location = response.data.display_name;
         console.log(lat+" "+long);
         var lat7 = lat.toFixed(7);
         var long7 = long.toFixed(7);
