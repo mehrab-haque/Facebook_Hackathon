@@ -222,7 +222,7 @@ const calculatePoint = (convo) =>{
         }*/
 	//console.log(res);
         sendLocation(lat,long,res.rows);
-        convo.end();
+       // convo.end();
     }).then(()=>{
         pool.query(`DELETE
                     FROM meet
