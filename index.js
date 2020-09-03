@@ -4,19 +4,18 @@ const Pool = require('pg').Pool;
 const axios = require('axios');
 
 const pool = new Pool({
-    user: process.env.db_user,
-    host: process.env.db_host,
-    database: process.env.db_db,
-    password: process.env.db_pass,
-    port: process.env.db_port
+    user: "root",
+    host: "bueteduproject1.cvt7xn6497l2.ap-south-1.rds.amazonaws.com",
+    database: "postgres",
+    password: "bueteduproject1",
+    port: "5432"
 })
 
 const bot = new BootBot({
-    accessToken: process.env.access_token,
-    verifyToken: process.env.verify_token,
-    appSecret: process.env.app_secret
+    accessToken: "EAAFKZABh8UxIBABML93tQT0dlnPUpeoP7l0RZAumsD8JrACBJUlnlBRKXZAQPe4ZAWYOFzZBrzR4AFnDO6HNdqZBzV8V3mFbaeVZBZCPr5hQciKhXHC0IHgXtclJaBnQfIEOfGRjoXZB2KQYm0rbER8RsbtBbUwmGNgbh6jEMpsqe11VN1cCOKr7THtiIiQdUtZBMZD",
+    verifyToken: "meetandgreet",
+    appSecret: "905d5db00438684f6b3856517220f9ad"
 });
-
 
 
 bot.setGreetingText('Welcome to BootBot. What are you looking for? Say Get started or hi');
@@ -140,7 +139,7 @@ const askLocation = (convo) =>{
                             'Thank you for staying with us.')
                         convo.end();
                     } else{
-                        convo.say('Your key is '+convo.get('key')).then(()=>{
+                        convo.say('Share the key with your firends. Your key is '+convo.get('key')).then(()=>{
                             waitToEnd(convo);
                         });
 
@@ -221,8 +220,9 @@ const calculatePoint = (convo) =>{
             bot.sendTextMessage(res.rows[i].user_id,`Your destination is Lat: ${lat} and Long: ${long}`);
         }*/
 	//console.log(res);
+		
         sendLocation(lat,long,res.rows);
-       // convo.end();
+        convo.end();
     }).then(()=>{
         pool.query(`DELETE
                     FROM meet
@@ -287,13 +287,15 @@ function makeid(length) {
 
 
 async function sendLocation(lat,long,dataRows){
+	 var lat7 = lat.toFixed(7);
+    var long7 = long.toFixed(7);
     try{
         const response = await axios.get('https://us1.locationiq.com/v1/reverse.php', {
             params: {
                 key: '5e137deebf37dc',
                 format: 'json',
-                lat: lat,
-                lon: long
+                lat: lat7,
+                lon: long7
             }
         });
        // console.log(response.data);
@@ -312,6 +314,7 @@ async function sendLocation(lat,long,dataRows){
             await bot.sendTextMessage(dataRows[i].user_id,`Route: https://www.google.com/maps/dir/?api=1&origin=${latt},${longt}&destination=${lat7},${long7}`);
 			await bot.sendTextMessage(dataRows[i].user_id,'Thank you for using meet and greet! We hope you have a great time together! If you wish to meet again you know what to do! Just say Hi!');
         }
+		
     } catch (error){
         console.log(error.message);
         const location = "Sorry, We couldn't find it";
