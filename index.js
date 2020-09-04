@@ -303,7 +303,7 @@ async function sendLocation(lat,long,dataRows){
             // console.log(response.data);
             location = response.data.display_name;
         } catch(error){
-            location = "error at finding location name";
+            location = "unknown location";
         }
         console.log(lat+" "+long);
         var lat7 = lat.toFixed(7);
