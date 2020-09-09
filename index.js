@@ -100,7 +100,7 @@ const sendGIF = (convo) =>{
 }
 
 const askLocation = (convo) =>{
-    convo.ask('What's your location?', (payload, convo) => {
+    convo.ask('What\'s your location?', (payload, convo) => {
         console.log(payload.message.text);
         if( payload.message.text.toLowerCase() === "end" ){
             convo.say("Thank you for staying with us! When you want to start again say Hi").then(()=>{
@@ -123,8 +123,8 @@ const askLocation = (convo) =>{
                     });
 					return;
                 }
-                console.log("Lat: "+text.lat);
-                console.log("Long: "+text.long);
+               /* console.log("Lat: "+text.lat);
+                console.log("Long: "+text.long);*/
 
 
                 const query = {
