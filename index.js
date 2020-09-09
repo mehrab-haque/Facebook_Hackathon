@@ -121,6 +121,7 @@ const askLocation = (convo) =>{
                     convo.say('Please send the location pin as the gif states. If you want to end the conversation type end').then(()=>{
                         askLocation(convo);
                     });
+					return;
                 }
                 console.log("Lat: "+text.lat);
                 console.log("Long: "+text.long);
