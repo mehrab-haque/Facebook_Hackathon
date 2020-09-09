@@ -51,7 +51,9 @@ const askType = (convo) => {
             convo.set('state', 'joint');
             askKey(convo);
         }else if(text.toLowerCase() === 'end'){
-            convo.end();
+            convo.say("Thank you for staying with us! When you want to start again say Hi").then(()=>{
+				convo.end();
+			})
         } else{
             convo.say('We couldn\'t catch what you just said. If you want to end the conversation type end').then(()=> askType(convo) );
         }
@@ -82,6 +84,7 @@ const createKey = (convo) =>{
         convo.set('name',name);
         convo.set('key',key);
         convo.set('id',user.id);
+		convo.sendTypingIndicator(500);
         sendGIF(convo);
     });
 }
@@ -97,10 +100,12 @@ const sendGIF = (convo) =>{
 }
 
 const askLocation = (convo) =>{
-    convo.ask('Whats your location', (payload, convo) => {
+    convo.ask('Whats your location?', (payload, convo) => {
         console.log(payload.message.text);
-        if( payload.message.text === "end" ){
-            convo.end();
+        if( payload.message.text.toLowerCase() === "end" ){
+            convo.say("Thank you for staying with us! When you want to start again say Hi").then(()=>{
+				convo.end();
+			})
         } else{
             convo.say('Please send the location pin as the gif states. If you want to end the conversation type end').then(()=>{
                 askLocation(convo);
@@ -139,7 +144,7 @@ const askLocation = (convo) =>{
                             'Thank you for staying with us.')
                         convo.end();
                     } else{
-                        convo.say('Share the key with your firends. Your key is '+convo.get('key')).then(()=>{
+                        convo.say('Share the key with your friends. Your key is '+convo.get('key')).then(()=>{
                             waitToEnd(convo);
                         });
 
@@ -164,7 +169,11 @@ const waitToEnd = (convo) => {
         const text = payload.message.text;
         if(text.toLowerCase() === 'end session' ){
             calculatePoint(convo);
-        }else{
+        }else if(text.toLowerCase() === 'end'){
+			convo.say("Thank you for staying with us! When you want to start again say Hi").then(()=>{
+				convo.end();
+			})
+		}else{
             convo.say('We couldn\'t catch what you just said.').then(()=> waitToEnd(convo) );
         }
 
@@ -173,6 +182,22 @@ const waitToEnd = (convo) => {
             event: 'postback:END_SESSION',
             callback: (payload, convo) => {
                 calculatePoint(convo);
+            }
+        },
+		{
+            event: 'postback:CREATE_SESSION',
+            callback: (payload, convo) => {
+               convo.say("Finish this session first! Then create a new one").then(()=>{
+				   waitToEnd(convo);
+			   })
+            }
+        },
+		{
+            event: 'postback:JOIN_SESSION',
+            callback: (payload, convo) => {
+                convo.say("You can't join your own session!Share the key with your friends").then(()=>{
+				   waitToEnd(convo);
+			   })
             }
         }
     ]);
@@ -240,8 +265,10 @@ const askKey = (convo) =>{
         ' . If you do not have one then ask your friend for one or ' +
         'create your own session',(payload,convo)=>{
         const key = payload.message.text;
-        if( key === "end" ){
-            convo.end();
+        if( key.toLowerCase() === "end" ){
+            convo.say("Thank you for staying with us! When you want to start again say Hi").then(()=>{
+				convo.end();
+			})
             return ;
         }
         console.log(key);
